@@ -1,6 +1,7 @@
-#include "Utility.hpp"
-#include <cstdarg>
 #include <memory>
+#include <cstdarg>
+#include <cstring>
+#include "Utility.hpp"
 
 std::string string_format (const std::string fmt_str, ...)
 {
