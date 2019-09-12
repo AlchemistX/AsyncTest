@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "Asyncable.hpp"
-#include "Waitable.hpp"
+#include "EventQueue.hpp"
+#include "Notification.hpp"
 
-TEST(Asyncable, timeout) 
+TEST(EventQueue, timeout) 
 {
-  Waitable w;
-  Asyncable a;
+  Notification w;
+  EventQueue a;
   GDestroyNotify MarkDone = [](gpointer data) {
-    Waitable* w = static_cast<Waitable*>(data);
+    Notification* w = static_cast<Notification*>(data);
     w->notify();
   };
   GSourceFunc Action = [](gpointer data) -> gboolean {

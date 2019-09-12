@@ -4,11 +4,11 @@
 #include <string>
 #include <glib.h>
 
-class Asyncable
+class EventQueue
 {
   public:
-    Asyncable(void);
-    ~Asyncable(void);
+    EventQueue(void);
+    ~EventQueue(void);
   public:
     uint32_t remTask(uint32_t id);
     uint32_t addIdle(GSourceFunc f, gpointer data, GDestroyNotify notify);

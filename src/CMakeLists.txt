@@ -2,8 +2,8 @@ FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_SEARCH_MODULE(GLIB2 REQUIRED glib-2.0)
 
 ADD_EXECUTABLE(async
-  Asyncable.cpp
-  Waitable.cpp
+  EventQueue.cpp
+  Notification.cpp
   Utility.cpp
   main.cpp)
 TARGET_LINK_LIBRARIES(async PUBLIC ${GLIB2_LIBRARIES} pthread)

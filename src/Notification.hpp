@@ -2,11 +2,11 @@
 #include <condition_variable>
 #include <mutex>
 
-class Waitable
+class Notification
 {
   public:
-    Waitable(void);
-    ~Waitable(void);
+    Notification(void);
+    ~Notification(void);
   public:
     void notify(void);
     void wait(void);

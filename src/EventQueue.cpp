@@ -1,9 +1,9 @@
 #include <system_error>
 #include <unistd.h>
-#include "Asyncable.hpp"
+#include "EventQueue.hpp"
 #include "Utility.hpp"
 
-Asyncable::Asyncable(void)
+EventQueue::EventQueue(void)
 {
   GMainContext *c = g_main_context_new();
   loop_           = g_main_loop_new(c, FALSE);
@@ -19,7 +19,7 @@ Asyncable::Asyncable(void)
   return;
 }
 
-Asyncable::~Asyncable(void)
+EventQueue::~EventQueue(void)
 {
   g_main_loop_quit(loop_);
   if (loopThread_->joinable()) {
@@ -33,23 +33,23 @@ Asyncable::~Asyncable(void)
   return;
 }
 
-uint32_t Asyncable::remTask(uint32_t id)
+uint32_t EventQueue::remTask(uint32_t id)
 {
   return remEventSource(id);
 }
 
-uint32_t Asyncable::addIdle(GSourceFunc f, gpointer data, GDestroyNotify notify)
+uint32_t EventQueue::addIdle(GSourceFunc f, gpointer data, GDestroyNotify notify)
 {
   return addEventSource(g_idle_source_new(), f, data, notify);
 }
 
-uint32_t Asyncable::addTimeout(GSourceFunc f, uint32_t interval,  gpointer data,
+uint32_t EventQueue::addTimeout(GSourceFunc f, uint32_t interval,  gpointer data,
     GDestroyNotify notify)
 {
   return addEventSource(g_timeout_source_new(interval), f, data, notify);
 }
 
-uint32_t Asyncable::addEventSource(GSource *s, GSourceFunc f, gpointer data,
+uint32_t EventQueue::addEventSource(GSource *s, GSourceFunc f, gpointer data,
     GDestroyNotify notify)
 {
   g_source_set_callback(s, f, data, notify);
@@ -61,7 +61,7 @@ uint32_t Asyncable::addEventSource(GSource *s, GSourceFunc f, gpointer data,
   return id;
 }
 
-uint32_t Asyncable::remEventSource(uint32_t id)
+uint32_t EventQueue::remEventSource(uint32_t id)
 {
   GSource *s = g_main_context_find_source_by_id(g_main_loop_get_context(loop_), id);
   if (s != nullptr)
@@ -69,7 +69,7 @@ uint32_t Asyncable::remEventSource(uint32_t id)
   return 0;
 }
 
-void Asyncable::handleError(const std::system_error &e)
+void EventQueue::handleError(const std::system_error &e)
 {
   errMessage_ = string_format("Caught a system_error with code %d meaning %s",
       e.code().value(), e.what());

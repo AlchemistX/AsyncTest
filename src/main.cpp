@@ -1,13 +1,13 @@
 #include <iostream>
-#include "Asyncable.hpp"
-#include "Waitable.hpp"
+#include "EventQueue.hpp"
+#include "Notification.hpp"
 
 int main(void)
 {
-  Waitable w;
-  Asyncable a;
+  Notification n;
+  EventQueue e;
   GDestroyNotify MarkDone = [](gpointer data) {
-        Waitable* w = static_cast<Waitable*>(data);
+        Notification* w = static_cast<Notification*>(data);
         w->notify();
       };
   GSourceFunc Action = [](gpointer data) -> gboolean {
@@ -15,9 +15,9 @@ int main(void)
         return FALSE;
       };
 
-  uint32_t id = a.addTimeout(Action, 5000, &w, MarkDone);
+  uint32_t id = e.addTimeout(Action, 5000, &n, MarkDone);
   
-  w.wait();
+  n.wait();
   
   return 0;
 }
