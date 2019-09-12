@@ -1,0 +1,17 @@
+FIND_PACKAGE(PkgConfig REQUIRED)
+PKG_SEARCH_MODULE(GLIB2 REQUIRED glib-2.0)
+
+ADD_EXECUTABLE(unit_tests
+  unit_asyncable.cpp
+  ${PROJECT_SOURCE_DIR}/src/Utility.cpp
+  ${PROJECT_SOURCE_DIR}/src/Asyncable.cpp
+  ${PROJECT_SOURCE_DIR}/src/Waitable.cpp)
+
+TARGET_LINK_LIBRARIES(unit_tests PUBLIC ${GLIB2_LIBRARIES} pthread gtest_main)
+TARGET_INCLUDE_DIRECTORIES(unit_tests PUBLIC ${GLIB2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/src)
+TARGET_COMPILE_OPTIONS(unit_tests PUBLIC ${GLIB2_CFLAGS_OTHER})
+
+ADD_TEST(
+  NAME unit 
+  COMMAND ${CMAKE_BINARY_DIR}/test/unit_tests
+)
