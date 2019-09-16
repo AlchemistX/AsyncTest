@@ -3,7 +3,6 @@ PKG_SEARCH_MODULE(GLIB2 REQUIRED glib-2.0)
 
 ADD_EXECUTABLE(async
   EventQueue.cpp
-  Notification.cpp
   Utility.cpp
   main.cpp)
 TARGET_LINK_LIBRARIES(async PUBLIC ${GLIB2_LIBRARIES} pthread)
