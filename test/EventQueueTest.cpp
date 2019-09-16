@@ -3,22 +3,65 @@
 #include "EventQueue.hpp"
 #include "Notification.hpp"
 
-TEST(EventQueue, timeout) 
+class EventQueueTest : public ::testing::Test
 {
-  Notification w;
-  EventQueue a;
-  GDestroyNotify MarkDone = [](gpointer data) {
-    Notification* w = static_cast<Notification*>(data);
-    w->notify();
-  };
-  GSourceFunc Action = [](gpointer data) -> gboolean {
-    std::cout << "BAM!" << std::endl;
-    return FALSE;
-  };
+  protected:
+    void SetUp() override
+    {
+      MarkDone = [](gpointer data) {
+        Param *p = static_cast<Param*>(data);
+        p->done = true;
+        p->n.notify();
+      };
 
-  uint32_t id = a.addTimeout(Action, 5000, &w, MarkDone);
+      Action = [](gpointer data) {
+        Param *p = static_cast<Param*>(data);
+        if (p->f)
+          return p->f(data);
+        else
+          return FALSE;
+      };
+    }
 
-  w.wait();
+    void TearDown() override
+    {
+    }
 
-  EXPECT_TRUE(true);
+    void Wait(void)
+    {
+      p.n.wait();
+    }
+
+    struct Param
+    {
+      Notification n;
+      GSourceFunc f{nullptr};
+      bool done{false};
+    } p;
+    EventQueue e;
+    GDestroyNotify MarkDone{nullptr};
+    GSourceFunc Action{nullptr};
+};
+
+TEST_F(EventQueueTest, Construct)
+{
+  EventQueue e;
+}
+
+TEST_F(EventQueueTest, IdleEvent) 
+{
+  uint32_t id = e.addIdle(Action, &p, MarkDone);
+  Wait();
+
+  EXPECT_TRUE(id != 0);
+  EXPECT_TRUE(p.done);
+}
+
+TEST_F(EventQueueTest, TimeoutEvent) 
+{
+  uint32_t id = e.addTimeout(Action, 5000, &p, MarkDone);
+  Wait();
+
+  EXPECT_TRUE(id != 0);
+  EXPECT_TRUE(p.done);
 }
