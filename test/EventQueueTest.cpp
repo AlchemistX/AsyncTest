@@ -100,3 +100,42 @@ TEST_F(EventQueueTest, MultiTimeoutEvent)
   EXPECT_TRUE(id1 && id2 && id3 && id4 && id5);
   EXPECT_TRUE(p.done);
 }
+
+TEST_F(EventQueueTest, MixedEvent) 
+{
+  uint32_t id1 = e.addTimeout(Action, 1000, &p, NULL);
+  uint32_t id2 = e.addIdle(Action, &p, NULL);
+  uint32_t id3 = e.addTimeout(Action, 1200, &p, NULL);
+  uint32_t id4 = e.addIdle(Action, &p, NULL);
+  uint32_t id5 = e.addTimeout(Action, 1400, &p, MarkDone);
+  Wait();
+
+  EXPECT_TRUE(p.count == 5);
+  EXPECT_TRUE(id1 && id2 && id3 && id4 && id5);
+  EXPECT_TRUE(p.done);
+}
+
+TEST_F(EventQueueTest, CancelEvent) 
+{
+  uint32_t id1 = e.addTimeout(Action, 1000, &p, NULL);
+  uint32_t id2 = 0;
+  {
+    struct Param {
+      Param(EventQueue &e, uint32_t id)
+        :e_(e), id_(id) {}
+      EventQueue &e_;
+      uint32_t id_;
+    } p(e, id1);
+    id2 = e.addTimeout([](gpointer data) {
+          Param *p = static_cast<Param*>(data); 
+          p->e_.remTask(p->id_);
+          return FALSE;
+        }, 500, &p, NULL);
+  }
+  uint32_t id3 = e.addTimeout(Action, 1100, &p, MarkDone);
+  Wait();
+
+  EXPECT_TRUE(p.count == 1);
+  EXPECT_TRUE(id1 && id2 && id3);
+  EXPECT_TRUE(p.done);
+}
