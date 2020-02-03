@@ -4,12 +4,19 @@ PROJECT(AsyncTest)
 SET(CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_VERBOSE_MAKEFILE True)
 
+OPTION(CodeCoverage "CodeCoverage" OFF)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+
 # we use this to get code coverage
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    if (CodeCoverage MATCHES ON)
+      INCLUDE(cmake/CodeCoverage.cmake)
+      append_coverage_compiler_flags()
+    endif()
+  endif()
 endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 ADD_SUBDIRECTORY(src)
 

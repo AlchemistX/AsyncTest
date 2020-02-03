@@ -15,3 +15,16 @@ ADD_TEST(
   NAME EventQueueTest
   COMMAND ${CMAKE_BINARY_DIR}/test/EventQueueTest
 )
+
+# we use this to get code coverage
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    if (CodeCoverage MATCHES ON)
+      setup_target_for_coverage_lcov(
+        NAME coverage
+        EXECUTABLE ${CMAKE_BINARY_DIR}/test/EventQueueTest
+        EXCLUDE "${CMAKE_BINARY_DIR}/googletest/*" "/usr/*")
+    endif()
+  endif()
+endif()
+
